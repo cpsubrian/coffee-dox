@@ -46,6 +46,94 @@ suite.addBatch
         version.description.body.should.equal ''
         version.tags.should.be.empty
 
+  'When parsing comment tags':
+    topic: fixture('b.coffee')
+
+    ', the parsed comments':
+      topic: (str) ->
+        cdox.parseComments str
+
+      'should have the correct version meta': (comments) ->
+        version = comments[0]
+        version.description.summary.should.equal('<p>Library version.</p>')
+        version.description.full.should.equal('<p>Library version.</p>')
+        version.tags.should.have.length(2)
+        version.tags[0].type.should.equal('type')
+        version.tags[0].types.should.eql(['String'])
+        version.tags[1].type.should.equal('api')
+        version.tags[1].visibility.should.equal('public')
+        version.ctx.type.should.equal('property')
+        version.ctx.receiver.should.equal('exports')
+        version.ctx.name.should.equal('version')
+        version.ctx.value.should.equal("'0.0.1'")
+
+      'should have the correct parse meta': (comments) ->
+        parse = comments[1]
+        parse.description.summary.should.equal('<p>Parse the given <code>str</code>.</p>')
+        parse.description.body.should.equal('<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>')
+        parse.description.full.should.equal('<p>Parse the given <code>str</code>.</p>\n\n<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>')
+        parse.tags[0].type.should.equal('param')
+        parse.tags[0].name.should.equal('str')
+        parse.tags[0].description.should.equal('to parse')
+        parse.tags[0].types.should.eql(['String', 'Buffer'])
+        parse.tags[1].type.should.equal('return')
+        parse.tags[1].types.should.eql(['String'])
+        parse.tags[2].visibility.should.equal('public')
+
+  'When parsing complex comments':
+    topic: fixture('c.coffee')
+
+    ', the parsed comments':
+      topic: (str) ->
+        cdox.parseComments str
+
+      'should have the correct file meta': (comments) ->
+        file = comments[0]
+        file.tags.should.be.empty
+        file.description.full.should.equal('<p>Dox<br />Copyright (c) 2011 Brian Link &lt;<a href=\'mailto:cpsubrian@gmail.com\'>cpsubrian@gmail.com</a>&gt;<br />MIT Licensed</p>')
+        file.ignore.should.be.true
+
+      'should have the correct mods meta': (comments) ->
+        mods = comments[1]
+        mods.tags.should.be.empty;
+        mods.description.full.should.equal('<p>Module dependencies.</p>')
+        mods.description.summary.should.equal('<p>Module dependencies.</p>')
+        mods.description.body.should.equal('')
+        mods.ignore.should.be.false
+        mods.code.should.equal('markdown = require(\'github-flavored-markdown\').parse\n{escape} = require \'./utils\'')
+        mods.ctx.type.should.equal('declaration')
+        mods.ctx.name.should.equal('markdown')
+        mods.ctx.value.should.equal('require(\'github-flavored-markdown\').parse')
+
+      'should have the correct version meta': (comments) ->
+        version = comments[2]
+        version.tags.should.be.empty
+        version.description.full.should.equal('<p>Library version.</p>')
+
+      'should have the correct parseComments meta': (comments) ->
+        parseComments = comments[3]
+        parseComments.tags.should.have.length(4);
+        parseComments.ctx.type.should.equal('method')
+        parseComments.ctx.receiver.should.equal('exports')
+        parseComments.ctx.name.should.equal('parseComments')
+        parseComments.description.full.should.equal('<p>Parse comments in the given string of <code>js</code>.</p>')
+        parseComments.description.summary.should.equal('<p>Parse comments in the given string of <code>js</code>.</p>')
+        parseComments.description.body.should.equal('')
+
+      'should have the correct parseComment meta': (comments) ->
+        parseComment = comments[4]
+        parseComment.tags.should.have.length(4)
+        parseComment.description.summary.should.equal('<p>Parse the given comment <code>str</code>.</p>')
+        parseComment.description.full.should.equal('<p>Parse the given comment <code>str</code>.</p>\n\n<h2>The comment object returned contains the following</h2>\n\n<ul>\n<li><code>tags</code> array of tag objects</li>\n<li><code>description</code> the first line of the comment</li>\n<li><code>body</code> lines following the description</li>\n<li><code>content</code> both the description and the body</li>\n<li><code>isPrivate</code> true when "@api private" is used</li>\n</ul>')
+        parseComment.description.body.should.equal('<h2>The comment object returned contains the following</h2>\n\n<ul>\n<li><code>tags</code> array of tag objects</li>\n<li><code>description</code> the first line of the comment</li>\n<li><code>body</code> lines following the description</li>\n<li><code>content</code> both the description and the body</li>\n<li><code>isPrivate</code> true when "@api private" is used</li>\n</ul>')
+
+      'should have the correct escape meta': (comments) ->
+        escape = comments.pop()
+        escape.tags.should.have.length(3)
+        escape.description.full.should.equal('<p>Escape the given <code>html</code>.</p>')
+        escape.ctx.type.should.equal('method')
+        escape.ctx.name.should.equal('escape')
+
 suite.export module
 return
 
@@ -54,83 +142,7 @@ The tests below still need to be ported to vows.
 ###
 `
 stillPortingTheseTests = {
-  'test .parseComments() tags': function(){
-    fixture('b.js', function(err, str){
-      var comments = dox.parseComments(str);
-
-      var version = comments.shift();
-      version.description.summary.should.equal('<p>Library version.</p>');
-      version.description.full.should.equal('<p>Library version.</p>');
-      version.tags.should.have.length(2);
-      version.tags[0].type.should.equal('type');
-      version.tags[0].types.should.eql(['String']);
-      version.tags[1].type.should.equal('api');
-      version.tags[1].visibility.should.equal('public');
-      version.ctx.type.should.equal('property');
-      version.ctx.receiver.should.equal('exports');
-      version.ctx.name.should.equal('version');
-      version.ctx.value.should.equal("'0.0.1'");
-
-      var parse = comments.shift();
-      parse.description.summary.should.equal('<p>Parse the given <code>str</code>.</p>');
-      parse.description.body.should.equal('<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>');
-      parse.description.full.should.equal('<p>Parse the given <code>str</code>.</p>\n\n<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>');
-      parse.tags[0].type.should.equal('param');
-      parse.tags[0].name.should.equal('str');
-      parse.tags[0].description.should.equal('to parse');
-      parse.tags[0].types.should.eql(['String', 'Buffer']);
-      parse.tags[1].type.should.equal('return');
-      parse.tags[1].types.should.eql(['String']);
-      parse.tags[2].visibility.should.equal('public');
-    });
-  },
-
   'test .parseComments() complex': function(){
-    fixture('c.js', function(err, str){
-      var comments = dox.parseComments(str);
-
-      var file = comments.shift();
-      file.tags.should.be.empty;
-      file.description.full.should.equal('<p>Dox<br />Copyright (c) 2010 TJ Holowaychuk &lt;<a href=\'mailto:tj@vision-media.ca\'>tj@vision-media.ca</a>&gt;<br />MIT Licensed</p>');
-      file.ignore.should.be.true;
-
-      var mods = comments.shift();
-      mods.tags.should.be.empty;
-      mods.description.full.should.equal('<p>Module dependencies.</p>');
-      mods.description.summary.should.equal('<p>Module dependencies.</p>');
-      mods.description.body.should.equal('');
-      mods.ignore.should.be.false;
-      mods.code.should.equal('var markdown = require(\'github-flavored-markdown\').parse;');
-      mods.ctx.type.should.equal('declaration');
-      mods.ctx.name.should.equal('markdown');
-      mods.ctx.value.should.equal('require(\'github-flavored-markdown\').parse');
-
-      var version = comments.shift();
-      version.tags.should.be.empty;
-      version.description.full.should.equal('<p>Library version.</p>');
-
-      var parseComments = comments.shift();
-      parseComments.tags.should.have.length(4);
-      parseComments.ctx.type.should.equal('method');
-      parseComments.ctx.receiver.should.equal('exports');
-      parseComments.ctx.name.should.equal('parseComments');
-      parseComments.description.full.should.equal('<p>Parse comments in the given string of <code>js</code>.</p>');
-      parseComments.description.summary.should.equal('<p>Parse comments in the given string of <code>js</code>.</p>');
-      parseComments.description.body.should.equal('');
-
-      var parseComment = comments.shift();
-      parseComment.tags.should.have.length(4);
-      parseComment.description.summary.should.equal('<p>Parse the given comment <code>str</code>.</p>');
-      parseComment.description.full.should.equal('<p>Parse the given comment <code>str</code>.</p>\n\n<h2>The comment object returned contains the following</h2>\n\n<ul>\n<li><code>tags</code> array of tag objects</li>\n<li><code>description</code> the first line of the comment</li>\n<li><code>body</code> lines following the description</li>\n<li><code>content</code> both the description and the body</li>\n<li><code>isPrivate</code> true when "@api private" is used</li>\n</ul>');
-      parseComment.description.body.should.equal('<h2>The comment object returned contains the following</h2>\n\n<ul>\n<li><code>tags</code> array of tag objects</li>\n<li><code>description</code> the first line of the comment</li>\n<li><code>body</code> lines following the description</li>\n<li><code>content</code> both the description and the body</li>\n<li><code>isPrivate</code> true when "@api private" is used</li>\n</ul>');
-
-      var escape = comments.pop();
-      escape.tags.should.have.length(3);
-      escape.description.full.should.equal('<p>Escape the given <code>html</code>.</p>');
-      escape.ctx.type.should.equal('function');
-      escape.ctx.name.should.equal('escape');
-    });
-
     fixture('d.js', function(err, str){
       var comments = dox.parseComments(str);
       var first = comments.shift();

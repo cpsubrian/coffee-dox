@@ -5,7 +5,7 @@ Copyright (c) 2011 Brian Link <cpsubrian@gmail.com>
 MIT Licensed
 ###
 
-###!
+###
 Module dependencies.
 ###
 
@@ -70,7 +70,7 @@ exports.parseComments = (cs) ->
 ###
 Parse the given comment `str`.
 
-The comment object returned contains the following
+The comment object returned contains the following:
 
   - `tags` array of tag objects
   - `description` the first line of the comment
@@ -208,7 +208,7 @@ exports.parseCodeContext = (str) ->
       string: RegExp.$1 + '.prototype.' + RegExp.$2 + '()'
 
   # prototype property
-  else if /^(\w+)::(\w+) *= *([^\n]+)/.exec str
+  else if /^(\w+)::(\w+) *= *([^\n;]+)/.exec str
     context = 
       type: 'property'
       constructor: RegExp.$1
@@ -225,7 +225,7 @@ exports.parseCodeContext = (str) ->
       string: RegExp.$1 + '.' + RegExp.$2 + '()'
 
   # property
-  else if /^(\w+)\.(\w+) *= *([^\n]+)/.exec str
+  else if /^(\w+)\.(\w+) *= *([^\n;]+)/.exec str
     context =
       type: 'property'
       receiver: RegExp.$1
@@ -234,7 +234,7 @@ exports.parseCodeContext = (str) ->
       string: RegExp.$1 + '.' + RegExp.$2
 
   # declaration
-  else if /^(\w+) *= *([^\n]+)/.exec str
+  else if /^(\w+) *= *([^\n;]+)/.exec str
     context =
       type: 'declaration'
       name: RegExp.$1
@@ -242,3 +242,17 @@ exports.parseCodeContext = (str) ->
       string: RegExp.$1
 
   context
+
+###
+Escape the given `html`.
+
+@param {String} html
+@return {String}
+@api private
+###
+
+exports.escape = (html) ->
+  String(html)
+   .replace(/&(?!\w+;)/g, '&amp;')
+   .replace(/</g, '&lt;')
+   .replace(/>/g, '&gt;')
