@@ -103,9 +103,9 @@ exports.parseComment = (str) ->
   body = full.split('\n\n').slice(1).join('\n\n')
 
   # markdown
-  comment.description.full = markdown full
-  comment.description.summary = markdown summary
-  comment.description.body = markdown body
+  comment.description.full = markdown escape(full)
+  comment.description.summary = markdown escape(summary)
+  comment.description.body = markdown escape(body)
 
   comment
 

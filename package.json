@@ -15,7 +15,7 @@
     "cdox": "./bin/coffeedox"
   },
   "engines": {
-    "node": "6.0.x"
+    "node": "0.6.x"
   },
   "dependencies": {
     "github-flavored-markdown": ">= 0.0.1",
