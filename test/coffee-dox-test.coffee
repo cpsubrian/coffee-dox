@@ -23,10 +23,10 @@ suite.addBatch
 
 # Parser Test
 suite.addBatch
-  'When parsing comment blocks':
+  'When parsing comment blocks,':
     topic: fixture('a.coffee')
 
-    ', the parsed comments':
+    'the parsed comments':
       topic: (str) ->
         cdox.parseComments str
 
@@ -46,10 +46,10 @@ suite.addBatch
         version.description.body.should.equal ''
         version.tags.should.be.empty
 
-  'When parsing comment tags':
+  'When parsing comment tags,':
     topic: fixture('b.coffee')
 
-    ', the parsed comments':
+    'the parsed comments':
       topic: (str) ->
         cdox.parseComments str
 
@@ -80,10 +80,10 @@ suite.addBatch
         parse.tags[1].types.should.eql(['String'])
         parse.tags[2].visibility.should.equal('public')
 
-  'When parsing complex comments':
+  'When parsing complex comments,':
     topic: fixture('c.coffee')
 
-    ', the parsed comments':
+    'the parsed comments':
       topic: (str) ->
         cdox.parseComments str
 
@@ -134,6 +134,59 @@ suite.addBatch
         escape.ctx.type.should.equal('method')
         escape.ctx.name.should.equal('escape')
 
+  'When parsing a complete code sample,':
+    topic: fixture('d.coffee')
+
+    'the parsed comments':
+      topic: (str) ->
+        cdox.parseComments str
+
+      'should have the correct description, tags, and code': (comments) ->
+        first = comments.shift()
+        first.tags.should.have.length(3)
+        first.description.full.should.equal('<p>Parse tag type string "{Array|Object}" etc.</p>')
+        first.description.summary.should.equal('<p>Parse tag type string "{Array|Object}" etc.</p>')
+        first.description.body.should.equal('')
+        first.ctx.type.should.equal('method')
+        first.ctx.receiver.should.equal('exports')
+        first.ctx.name.should.equal('parseTagTypes')
+        first.code.should.equal('exports.parseTagTypes = (str) ->\n  str.replace(\'foo\', \'bar\').split(\',\')')
+
+  'When parsing comment tags again,':
+    topic: fixture('b.coffee')
+
+    'the parse comments':
+      topic: (str) ->
+        cdox.parseComments str
+
+      'should have the correct code segments': (comments) ->
+        version = comments.shift()
+        parse = comments.shift()
+
+        version.code.should.equal("exports.version = '0.0.1'")
+        parse.code.should.equal('exports.parse = (str) ->\n  "wahoo"')
+
+  'When parsing a function expression':
+    topic: cdox.parseCodeContext 'foo = () ->\n'
+
+    'the type should be "function"': (context) ->
+      context.type.should.equal('function')
+
+    'the name should be "foo"': (context) ->
+      context.name.should.equal('foo')
+
+  'When parsing a prototype method':
+    topic: cdox.parseCodeContext 'User::save = ->\n'
+
+    'the type should be method': (context) ->
+      context.type.should.equal('method')
+
+    'the constructor should be "User"': (context) ->
+      context.constructor.should.equal('User')
+
+    'the name should be "save"': (context) ->
+      context.name.should.equal('save')
+
 suite.export module
 return
 
@@ -141,50 +194,12 @@ return
 The tests below still need to be ported to vows.
 ###
 `
-stillPortingTheseTests = {
-  'test .parseComments() complex': function(){
-    fixture('d.js', function(err, str){
-      var comments = dox.parseComments(str);
-      var first = comments.shift();
-      first.tags.should.have.length(3);
-      first.description.full.should.equal('<p>Parse tag type string "{Array|Object}" etc.</p>');
-      first.description.summary.should.equal('<p>Parse tag type string "{Array|Object}" etc.</p>');
-      first.description.body.should.equal('');
-      first.ctx.type.should.equal('method');
-      first.ctx.receiver.should.equal('exports');
-      first.ctx.name.should.equal('parseTagTypes');
-      first.code.should.equal('exports.parseTagTypes = function(str) {\n return str\n .replace(/[{}]/g, \'\')\n .split(/ *[|,\\/] */);\n};');
-    });
-  },
-  
-  'test .parseComments() code': function(){
-    fixture('b.js', function(err, str){
-      var comments = dox.parseComments(str)
-        , version = comments.shift()
-        , parse = comments.shift();
-
-      version.code.should.equal("exports.version = '0.0.1';");
-      parse.code.should.equal('exports.parse = function(str) {\n return "wahoo";\n}');
-    });
-  },
+stillPortingTheseTests = {  
 
   'test .parseCodeContext() function statement': function(){
     var ctx = dox.parseCodeContext('function foo(){\n\n}');
     ctx.type.should.equal('function');
     ctx.name.should.equal('foo');
-  },
-  
-  'test .parseCodeContext() function expression': function(){
-    var ctx = dox.parseCodeContext('var foo = function(){\n\n}');
-    ctx.type.should.equal('function');
-    ctx.name.should.equal('foo');
-  },
-  
-  'test .parseCodeContext() prototype method': function(){
-    var ctx = dox.parseCodeContext('User.prototype.save = function(){}');
-    ctx.type.should.equal('method');
-    ctx.constructor.should.equal('User');
-    ctx.name.should.equal('save');
   },
   
   'test .parseCodeContext() prototype property': function(){
