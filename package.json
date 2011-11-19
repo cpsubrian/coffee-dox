@@ -1,5 +1,5 @@
 {
-  "author": "Brian Link <cpsubrian@gmail.com> (http://www.terraeclipse.com)",
+  "author": "Brian Link <cpsubrian@gmail.com>",
   "name": "coffee-dox",
   "description": "CoffeeScript port of Dox",
   "keywords": ["documentation", "docs", "markdown", "jsdoc", "coffeescript"],

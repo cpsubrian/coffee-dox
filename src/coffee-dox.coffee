@@ -110,11 +110,11 @@ exports.parseComment = (str) ->
   comment
 
 ###
-# Parse tag string "@param {Array} name description" etc.
-#
-# @param {String}
-# @return {Object}
-# @api public
+Parse tag string "@param {Array} name description" etc.
+
+@param {String}
+@return {Object}
+@api public
 ###
 
 exports.parseTag = (str) ->
