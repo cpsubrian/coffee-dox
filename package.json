@@ -1,0 +1,29 @@
+{
+  "author": "Brian Link <cpsubrian@gmail.com> (http://www.terraeclipse.com)",
+  "name": "coffee-dox",
+  "description": "CoffeeScript port of Dox",
+  "keywords": ["documentation", "docs", "markdown", "jsdoc", "coffeescript"],
+  "version": "0.0.1",
+  "homepage": "cpsubrian.github.c\u001b[A\u001b[",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cpsubrian/coffee-dox.git"
+  },
+  "main": "index.js",
+  "bin": {
+    "coffeedox": "./bin/coffeedox",
+    "cdox": "./bin/coffeedox"
+  },
+  "engines": {
+    "node": "6.0.x"
+  },
+  "dependencies": {
+    "github-flavored-markdown": ">= 0.0.1",
+    "commander": "0.2.x"
+  },
+  "devDependencies": {
+    "coffee-script": "1.1.x",
+    "vows": "0.5.x",
+    "should": "0.3.x"
+  }
+}
