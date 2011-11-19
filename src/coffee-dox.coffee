@@ -86,14 +86,9 @@ The comment object returned contains the following
 
 exports.parseComment = (str) ->
   str = str.trim()
-  comment = { tags: [] }
-  description = {}
-
-  # parse comment body
-  description.full = str.split('\n@')[0].replace(/^([\w ]+):$/gm, '## $1')
-  description.summary = description.full.split('\n\n')[0]
-  description.body = description.full.split('\n\n').slice(1).join('\n\n')
-  comment.description = description
+  comment = 
+    tags: []
+    description: {}
 
   # parse tags
   if ~str.indexOf('\n@')
@@ -102,10 +97,15 @@ exports.parseComment = (str) ->
     comment.isPrivate = comment.tags.some (tag) ->
       'api' is tag.type and 'private' is tag.visibility
 
+  # parse comment body
+  full = str.split('\n@')[0].replace(/^([\w ]+):$/gm, '## $1')
+  summary = full.split('\n\n')[0]
+  body = full.split('\n\n').slice(1).join('\n\n')
+
   # markdown
-  description.full = markdown description.full
-  description.summary = markdown description.summary
-  description.body = markdown description.body
+  comment.description.full = markdown full
+  comment.description.summary = markdown summary
+  comment.description.body = markdown body
 
   comment
 
