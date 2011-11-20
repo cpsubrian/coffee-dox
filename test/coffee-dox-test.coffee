@@ -30,69 +30,68 @@ suite.addBatch
 
 # Parser Test
 suite.addBatch
-  'When parsing comment blocks,':
+  'When reading a file with comment blocks':
     topic: fixture 'a.coffee'
 
-    'the parsed comments':
-      topic: (str) ->
-        cdox.parseComments str
+    'and parsing it,':
+      topic: (str) -> cdox.parseComments str
 
-      'should have the correct file meta': (comments) ->
-        file = comments[0]
-        file.should.have.property 'ignore', true
-        file.description.full.should.equal '<p>A<br />Copyright (c) 2010 Author Name &lt;Author Email&gt;<br />MIT Licensed</p>'
-        file.description.summary.should.equal '<p>A<br />Copyright (c) 2010 Author Name &lt;Author Email&gt;<br />MIT Licensed</p>'
-        file.description.body.should.equal ''
-        file.tags.should.be.empty
+      'the file comment meta': quickVows
+        topic: (comments) -> comments[0]
+        'it should have property': 'ignore'
+        'the ignore should be true': ''
+        'the description full should equal': '<p>A<br />Copyright (c) 2010 Author Name &lt;Author Email&gt;<br />MIT Licensed</p>'
+        'the description summary should equal': '<p>A<br />Copyright (c) 2010 Author Name &lt;Author Email&gt;<br />MIT Licensed</p>'
+        'the description body should equal': ''
+        'the tags should be empty': ''
 
-      'should have the correct version meta': (comments) ->
-        version = comments[1]
-        version.should.have.property 'ignore', false
-        version.description.full.should.equal '<p>Library version.</p>'
-        version.description.summary.should.equal '<p>Library version.</p>'
-        version.description.body.should.equal ''
-        version.tags.should.be.empty
+      'the version comment meta': quickVows
+        topic: (comments) -> comments[1]
+        'it should have property': 'ignore'
+        'the ignore should be false': ''
+        'the description full should equal': '<p>Library version.</p>'
+        'the description summary should equal': '<p>Library version.</p>'
+        'the description body should equal': ''
+        'the tags should be empty': ''
 
-  'When parsing comment tags,':
+  'When reading a file with comment tags,':
     topic: fixture 'b.coffee'
 
-    'the parsed comments':
-      topic: (str) ->
-        cdox.parseComments str
+    'and parsing it':
+      topic: (str) -> cdox.parseComments str
 
-      'should have the correct version meta': (comments) ->
-        version = comments[0]
-        version.description.summary.should.equal '<p>Library version.</p>'
-        version.description.full.should.equal '<p>Library version.</p>'
-        version.tags.should.have.length 2
-        version.tags[0].type.should.equal 'type'
-        version.tags[0].types.should.eql ['String']
-        version.tags[1].type.should.equal 'api'
-        version.tags[1].visibility.should.equal 'public'
-        version.ctx.type.should.equal 'property'
-        version.ctx.receiver.should.equal 'exports'
-        version.ctx.name.should.equal 'version'
-        version.ctx.value.should.equal "'0.0.1'"
+      'the version comment meta': quickVows
+        topic: (comments) -> comments[0]
+        'the description summary should equal': '<p>Library version.</p>'
+        'the description full should equal': '<p>Library version.</p>'
+        'the tags should have length': 2
+        'the tags 0 type should equal': 'type'
+        'the tags 0 types should eql': ['String']
+        'the tags 1 type should equal': 'api'
+        'the tags 1 visibility should equal': 'public'
+        'the ctx type should equal': 'property'
+        'the ctx receiver should equal': 'exports'
+        'the ctx name should equal': 'version'
+        'the ctx value should equal': "'0.0.1'"
 
-      'should have the correct parse meta': (comments) ->
-        parse = comments[1]
-        parse.description.summary.should.equal '<p>Parse the given <code>str</code>.</p>'
-        parse.description.body.should.equal '<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>'
-        parse.description.full.should.equal '<p>Parse the given <code>str</code>.</p>\n\n<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>'
-        parse.tags[0].type.should.equal 'param'
-        parse.tags[0].name.should.equal 'str'
-        parse.tags[0].description.should.equal 'to parse'
-        parse.tags[0].types.should.eql ['String', 'Buffer']
-        parse.tags[1].type.should.equal 'return'
-        parse.tags[1].types.should.eql ['String']
-        parse.tags[2].visibility.should.equal 'public'
+      'the parse comment meta': quickVows
+        topic: (comments) -> comments[1]
+        'the description summary should equal': '<p>Parse the given <code>str</code>.</p>'
+        'the description body should equal': '<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>'
+        'the description full should equal': '<p>Parse the given <code>str</code>.</p>\n\n<h2>Examples</h2>\n\n<pre><code>parse(str)\n// =&amp;gt; "wahoo"\n</code></pre>'
+        'the tags 0 type should equal': 'param'
+        'the tags 0 name should equal': 'str'
+        'the tags 0 description should equal': 'to parse'
+        'the tags 0 types should eql': ['String', 'Buffer']
+        'the tags 1 type should equal': 'return'
+        'the tags 1 types should eql': ['String']
+        'the tags 2 visibility should equal': 'public'
 
   'When parsing complex comments,':
     topic: fixture 'c.coffee'
 
     'the parsed comments':
-      topic: (str) ->
-        cdox.parseComments str
+      topic: (str) -> cdox.parseComments str
 
       'should have the correct file meta': (comments) ->
         file = comments[0]
@@ -145,8 +144,7 @@ suite.addBatch
     topic: fixture 'd.coffee'
 
     'the parsed comments':
-      topic: (str) ->
-        cdox.parseComments str
+      topic: (str) -> cdox.parseComments str
 
       'should have the correct description, tags, and code': (comments) ->
         first = comments.shift()
@@ -163,8 +161,7 @@ suite.addBatch
     topic: fixture 'b.coffee'
 
     'the parse comments':
-      topic: (str) ->
-        cdox.parseComments str
+      topic: (str) -> cdox.parseComments str
 
       'should have the correct code segments': (comments) ->
         version = comments.shift()
@@ -174,7 +171,7 @@ suite.addBatch
         parse.code.should.equal 'exports.parse = (str) ->\n  "wahoo"'
 
   'When parsing a function expression': quickVows
-    topic: cdox.parseCodeContext 'foo = () ->\n'    
+    topic: cdox.parseCodeContext 'foo = () ->\n'
     'the type should equal': 'function'
     'the name should equal': 'foo'
 

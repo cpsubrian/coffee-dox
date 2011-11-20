@@ -1,8 +1,8 @@
 ###
 Parse string vows into should.js assertions.
 
-Example Usage: 
-  
+Example Usage:
+
     vows.describe('quickVows Example').addBatch
 
       'My context description': quickVows
@@ -12,8 +12,8 @@ Example Usage:
         'the colors should be an instaceOf': Array
         'the colors should eql': ['blue', 'green']
 
-In the vows property keys, 'the' will be replaced with the topic.  The above
-example translates directly to:
+In the vows property keys, 'the', 'it' and 'its' (at the beginning of the vow)
+will be replaced with the topic.  The above example translates directly to:
 
     vows.describe('quickVows Example').addBatch
 
@@ -40,19 +40,19 @@ module.exports = (convert) ->
     do (vow, arg) ->
       if vow is 'topic'
         context.topic = arg
-      else      
+      else
         context["#{vow} '#{arg}'"] = (topic) ->
-          obj = {}
+          obj = topic
           scope = {}
           for part in vow.split(' ')
-            if part is 'the'
-              obj = topic
-            else
+            if not /^(?:the|it|its)$/.test part
               obj = obj[part]
             if part is 'should'
               scope = obj
           if typeof obj is 'function'
             obj.call scope, arg
+          else if /^(?:empty|arguments|ok|true|false)$/.test part
+            # The assertion is already made.
           else
             throw new Error 'quickVow did not resolve into a function'
   context
