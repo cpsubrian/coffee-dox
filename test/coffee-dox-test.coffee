@@ -4,14 +4,21 @@ Vows tests for CoffeeDox
 
 cdox = require '../'
 should = require 'should'
-fs = require 'fs'
 vows = require 'vows'
+fixture = require './helpers/fixture'
+quickVows = require './helpers/quick-vows'
 
-fixture = (name) ->
-  return () ->
-    fs.readFile(__dirname + '/fixtures/' + name, 'utf8', @callback)
-
+# Create the test suite.
 suite = vows.describe('CoffeeDox')
+
+# Test quickVows macro.
+suite.addBatch
+  'Testing quickVows': quickVows
+    topic: {name: 'myTopic', size: 15, colors: ['blue', 'green']}
+    'the name should equal': 'myTopic'
+    'the size should equal': 15
+    'the colors should be an instanceof': Array
+    'the colors should eql': ['blue', 'green']
 
 # App Tests
 suite.addBatch
@@ -166,180 +173,94 @@ suite.addBatch
         version.code.should.equal "exports.version = '0.0.1'"
         parse.code.should.equal 'exports.parse = (str) ->\n  "wahoo"'
 
-  'When parsing a function expression':
-    topic: cdox.parseCodeContext 'foo = () ->\n'
+  'When parsing a function expression': quickVows
+    topic: cdox.parseCodeContext 'foo = () ->\n'    
+    'the type should equal': 'function'
+    'the name should equal': 'foo'
 
-    'the type should be "function"': (context) ->
-      context.type.should.equal 'function'
-
-    'the name should be "foo"': (context) ->
-      context.name.should.equal 'foo'
-
-  'When parsing a prototype method':
+  'When parsing a prototype method': quickVows
     topic: cdox.parseCodeContext 'User::save = ->\n'
+    'the type should equal': 'method'
+    'the constructor should equal': 'User'
+    'the name should equal': 'save'
 
-    'the type should be method': (context) ->
-      context.type.should.equal 'method'
-
-    'the constructor should be "User"': (context) ->
-      context.constructor.should.equal 'User'
-
-    'the name should be "save"': (context) ->
-      context.name.should.equal 'save'
-
-  'When parsing a prototype property':
+  'When parsing a prototype property': quickVows
     topic: cdox.parseCodeContext 'Database::enabled = true\nasdf'
+    'the type should equal': 'property'
+    'the constructor should equal': 'Database'
+    'the name should equal': 'enabled'
+    'the value should equal': 'true'
 
-    'the type should be "property"': (context) ->
-      context.type.should.equal 'property'
-
-    'the constructor should be "Database"': (context) ->
-      context.constructor.should.equal 'Database'
-
-    'the name should be "enabled"': (context) ->
-      context.name.should.equal 'enabled'
-
-    'the value should be "true"': (context) ->
-      context.value.should.equal 'true'
-
-  'When parsing a method':
+  'When parsing a method': quickVows
     topic: cdox.parseCodeContext 'user.save = () ->'
+    'the type should equal': 'method'
+    'the receiver should equal': 'user'
+    'the name should equal': 'save'
 
-    'the type should be "method"': (context) ->
-      context.type.should.equal 'method'
-
-    'the receiver should be "user"': (context) ->
-      context.receiver.should.equal 'user'
-
-    'the name should be "save"': (context) ->
-      context.name.should.equal 'save'
-
-  'When parsing a property':
+  'When parsing a property': quickVows
     topic: cdox.parseCodeContext 'user.name = "Brian"\nasdf'
+    'the type should equal': 'property'
+    'the receiver should equal': 'user'
+    'the name should equal': 'name'
+    'the value should equal': '"Brian"'
 
-    'the type should be "property"': (context) ->
-      context.type.should.equal 'property'
-
-    'the receiver should be "user"': (context) ->
-      context.receiver.should.equal 'user'
-
-    'the name should be "name"': (context) ->
-      context.name.should.equal 'name'
-
-    'the value should be "Brian"': (context) ->
-      context.value.should.equal '"Brian"'
-
-  'When parsing a declaration':
+  'When parsing a declaration': quickVows
     topic: cdox.parseCodeContext 'name = "Brian"\nadf'
+    'the type should equal': 'declaration'
+    'the name should equal': 'name'
+    'the value should equal': '"Brian"'
 
-    'the type should be "declaration"': (context) ->
-      context.type.should.equal 'declaration'
-
-    'the name should equal "name"': (context) ->
-      context.name.should.equal 'name'
-
-    'the value should equal "Brian"': (context) ->
-      context.value.should.equal '"Brian"'
-
-  'When parsing a @constructor tag':
+  'When parsing a @constructor tag': quickVows
     topic: cdox.parseTag '@constructor'
-
-    'the type should be "constrcutor"': (tag) ->
-      tag.type.should.equal 'constructor'
+    'the type should equal': 'constructor'
 
   'When parsing a @see tag,':
 
-    'that only has a url':
+    'that only has a url': quickVows
       topic: cdox.parseTag '@see http://google.com'
+      'the type should equal': 'see'
+      'the title should equal': ''
+      'the url should equal': 'http://google.com'
 
-      'the type should be "see"': (tag) ->
-        tag.type.should.equal 'see'
-
-      'the title should be empty': (tag) ->
-        tag.title.should.equal ''
-
-      'the url should be "http://google.com"': (tag) ->
-        tag.url.should.equal('http://google.com')
-
-    'that has a title and url':
+    'that has a title and url': quickVows
       topic: cdox.parseTag '@see Google http://google.com'
+      'the type should equal': 'see'
+      'the title should equal': 'Google'
+      'the url should equal': 'http://google.com'
 
-      'the type should be "see"': (tag) ->
-        tag.type.should.equal 'see'
-
-      'the title should be "Google"': (tag) ->
-        tag.title.should.equal 'Google'
-
-      'the url should be "http://google.com"': (tag) ->
-        tag.url.should.equal 'http://google.com'
-
-    'that has a reference to other code':
+    'that has a reference to other code': quickVows
       topic: cdox.parseTag '@see exports.parseComment'
+      'the type should equal': 'see'
+      'the local should equal': 'exports.parseComment'
 
-      'the type should be "see"': (tag) ->
-        tag.type.should.equal 'see'
-
-      'the local should be "exports.parseComment"': (tag) ->
-        tag.local.should.equal 'exports.parseComment'
-
-  'When parsing an @api tag':
+  'When parsing an @api tag': quickVows
     topic: cdox.parseTag '@api private'
+    'the type should equal': 'api'
+    'the visibility should equal': 'private'
 
-    'the type should be "api"': (tag) ->
-      tag.type.should.equal 'api'
-
-    'the visibility should be "private"': (tag) ->
-      tag.visibility.should.equal 'private'
-
-  'When parsing a @type tag':
+  'When parsing a @type tag': quickVows
     topic: cdox.parseTag '@type {String}'
+    'the type should equal': 'type'
+    'the types should eql': ['String']
 
-    'the type should be "type"': (tag) ->
-      tag.type.should.equal 'type'
-
-    'the types should be ["String"]': (tag) ->
-      tag.types.should.eql ['String']
-
-  'When parsing a @param tag':
+  'When parsing a @param tag': quickVows
     topic: cdox.parseTag '@param {String|Buffer}'
+    'the type should equal': 'param'
+    'the types should eql': ['String', 'Buffer']
+    'the name should equal': ''
+    'the description should equal': ''
 
-    'the type should be "param"': (tag) ->
-      tag.type.should.equal 'param'
-
-    'the types should be ["String", "Buffer"]': (tag) ->
-      tag.types.should.eql ['String', 'Buffer']
-
-    'the name should be empty': (tag) ->
-      tag.name.should.equal ''
-
-    'the description should be empty': (tag) ->
-      tag.description.should.equal ''
-
-  'When parsing a @param tag with and name and description':
+  'When parsing a @param tag with and name and description': quickVows
     topic: cdox.parseTag '@param {String} name - A person\'s name'
+    'the type should equal': 'param'
+    'the types should eql': ['String']
+    'the name should equal': 'name'
+    'the description should equal': '- A person\'s name'
 
-    'the type should be "param"': (tag) ->
-      tag.type.should.equal 'param'
-
-    'the types should be ["String"]': (tag) ->
-      tag.types.should.eql ['String']
-
-    'the name should be "name"': (tag) ->
-      tag.name.should.equal 'name'
-
-    'the description should be "- a person\'s name"': (tag) ->
-      tag.description.should.equal '- A person\'s name'
-
-  'When parsing a @return tag':
+  'When parsing a @return tag': quickVows
     topic: cdox.parseTag '@return {String} a normal string'
-
-    'the type should be "return"': (tag) ->
-      tag.type.should.equal 'return'
-
-    'the types should be ["String"]': (tag) ->
-      tag.types.should.eql ['String']
-
-    'the description should be "a normal string"': (tag) ->
-      tag.description.should.equal 'a normal string'
+    'the type should equal': 'return'
+    'the types should eql': ['String']
+    'the description should equal': 'a normal string'
 
 suite.export module
