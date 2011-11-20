@@ -2,6 +2,8 @@ fs = require 'fs'
 {print} = require 'util'
 {spawn, exec} = require 'child_process'
 
+option '-s', '--spec', 'Use vows spec mode'
+
 build = (watch, callback) ->
   if typeof watch is 'function'
     callback = watch
@@ -20,9 +22,9 @@ task 'build', 'Compile CoffeeScript source files', ->
 task 'watch', 'Recompile CoffeeScript source files when modified', ->
   build true
 
-task 'test', 'Run Vows tests for CoffeeDox', ->
-  options = ['test/coffee-dox-test.coffee', '--spec']
-  spec = spawn 'vows', options
-  spec.stdout.on 'data', (data) -> print data.toString()
-  spec.stderr.on 'data', (data) -> print data.toString()
-  spec.on 'exit', (status) -> callback?() if status is 0
+task 'test', 'Run Vows tests', (options) ->
+  command = "vows test/*.coffee" + (if options.spec then " --spec" else "")
+  exec command, (err, stdout, stderr) ->
+    console.log("> #{command}")
+    console.log(stdout)
+    console.log(stderr)

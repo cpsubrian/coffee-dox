@@ -11,15 +11,6 @@ quickVows = require './helpers/quick-vows'
 # Create the test suite.
 suite = vows.describe('CoffeeDox')
 
-# Test quickVows macro.
-suite.addBatch
-  'Testing quickVows': quickVows
-    topic: {name: 'myTopic', size: 15, colors: ['blue', 'green']}
-    'the name should equal': 'myTopic'
-    'the size should equal': 15
-    'the colors should be an instanceof': Array
-    'the colors should eql': ['blue', 'green']
-
 # App Tests
 suite.addBatch
   'Application version':
