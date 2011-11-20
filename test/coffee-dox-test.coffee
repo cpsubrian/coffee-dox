@@ -54,10 +54,10 @@ suite.addBatch
         'the description body should equal': ''
         'the tags should be empty': ''
 
-  'When reading a file with comment tags,':
+  'When reading a file with comment tags':
     topic: fixture 'b.coffee'
 
-    'and parsing it':
+    'and parsing it,':
       topic: (str) -> cdox.parseComments str
 
       'the version comment meta': quickVows

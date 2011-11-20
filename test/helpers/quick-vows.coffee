@@ -55,7 +55,7 @@ module.exports = (convert) ->
           if typeof obj is 'function'
             obj.call scope, arg
           else if /^(?:empty|arguments|ok|true|false)$/.test part
-            # The assertion is already made.
+            # The assertion has already been made.
           else
             throw new Error 'quickVow did not resolve into a function'
   context
