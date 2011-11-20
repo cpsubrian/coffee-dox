@@ -41,7 +41,10 @@ module.exports = (convert) ->
       if vow is 'topic'
         context.topic = arg
       else
-        context["#{vow} '#{arg}'"] = (topic) ->
+        argString = "#{arg}"
+        argString = argString.substr(0, 20) + '...' if argString.length > 30
+        argString = argString.replace(/\n*/g, '')
+        context["#{vow} '#{argString}'"] = (topic) ->
           obj = topic
           scope = {}
           for part in vow.split(' ')
