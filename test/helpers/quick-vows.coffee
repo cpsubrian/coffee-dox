@@ -7,9 +7,10 @@ Example Usage:
 
       'My context description': quickVows
         topic: {name: 'myTopic', size: 15, colors: ['blue', 'green']}
+        'it should have property': 'name'
         'the name should equal': 'myTopic'
-        'the size should equal': 15
-        'the colors should be an instaceOf': Array
+        'its size should equal': 15
+        'colors should be an instaceOf': Array
         'the colors should eql': ['blue', 'green']
 
 In the vows property keys, 'the', 'it' and 'its' (at the beginning of the vow)
@@ -42,19 +43,19 @@ module.exports = (convert) ->
         context.topic = arg
       else
         argString = "#{arg}"
-        argString = argString.substr(0, 20) + '...' if argString.length > 30
         argString = argString.replace(/\n*/g, '')
+        argString = argString.substr(0, 30) + '...' if argString.length > 30
         context["#{vow} '#{argString}'"] = (topic) ->
           obj = topic
           scope = {}
           for part in vow.split(' ')
-            if not /^(?:the|it|its)$/.test part
+            if not /^(the|it|its)$/.test part
               obj = obj[part]
             if part is 'should'
               scope = obj
           if typeof obj is 'function'
             obj.call scope, arg
-          else if /^(?:empty|arguments|ok|true|false)$/.test part
+          else if /^(empty|arguments|ok|true|false)$/.test part
             # The assertion has already been made.
           else
             throw new Error 'quickVow did not resolve into a function'
