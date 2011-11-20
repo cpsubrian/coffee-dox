@@ -40,7 +40,7 @@ exports.parseComments = (cs) ->
         comment = comments[comments.length - 1]
         comment.code = code = buf.trim()
         comment.ctx = exports.parseCodeContext code
-        buf = ''      
+        buf = ''
       i += 3
       within = true
       ignore = '!' == cs[i]
@@ -86,7 +86,7 @@ The comment object returned contains the following
 
 exports.parseComment = (str) ->
   str = str.trim()
-  comment = 
+  comment =
     tags: []
     description: {}
 
@@ -119,7 +119,7 @@ Parse tag string "@param {Array} name description" etc.
 
 exports.parseTag = (str) ->
   tag = {}
-  parts = str.split /\ +/
+  parts = str.split /[\ \n]+/
   type = tag.type = parts.shift().replace('@', '')
 
   switch type
@@ -183,17 +183,8 @@ exports.parseCodeContext = (str) ->
   str = str.split('\n')[0]
   context = {}
 
-  ## function statement
-  if false
-  #if /^function (\w+)\(/.exec str
-  #  return {
-  #      type: 'function'
-  #    , name: RegExp.$1
-  #    , string: RegExp.$1 + '()'
-  #  };
-
   # function expression
-  else if /^(\w+) *= *(\((\w*)\))? *->|=>/.exec str
+  if /^(\w+) *= *(\((\w*)\))? *->|=>/.exec str
     context =
       type: 'function'
       name: RegExp.$1
@@ -209,7 +200,7 @@ exports.parseCodeContext = (str) ->
 
   # prototype property
   else if /^(\w+)::(\w+) *= *([^\n]+)/.exec str
-    context = 
+    context =
       type: 'property'
       constructor: RegExp.$1
       name: RegExp.$2
